@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: node8:local
+    volumes:
+      - .:/data
+    ports:
+      - "3001:3001"
+    working_dir: /data
+    command: ["yarn", "run", "client:start"]
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: node8:local
+    volumes:
+      - .:/data
+    ports:
+      - "3000:3000"
+    working_dir: /data
+    command: ["yarn", "run", "server:start"]
+
+
+networks:
+  default:
+    external:
+      name: local
