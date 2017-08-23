@@ -4,7 +4,7 @@ import fs from 'fs';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
-import App from '../client/App.jsx';
+import App from '../client/app.js';
 
 const server = express();
 
@@ -20,7 +20,7 @@ server.use('/ssr', (req, res) => {
 
 server.get('/', (req, res) => {
   const html = fs.readFileSync(path.join(clientDistPath, 'index.html'), 'utf-8');
-  const mod = html.replace('</head>', '<style>body { background-color: papayawhip; } </style></head>');
+  const mod = html.replace('</head>', '<meta name="boom" value="boomboom" /></head>');
   res.send(mod);
 });
 
