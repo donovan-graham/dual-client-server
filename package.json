@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "npm run client:build && npm run server:build",
     "client:start": "webpack-dev-server --config=./client/webpack.config.js",
     "client:build": "webpack -p --config=./client/webpack.config.js",
     "server:start": "babel-watch ./server/index.js",
