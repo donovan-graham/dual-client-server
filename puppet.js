@@ -11,7 +11,7 @@ const html = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width">
 </head>
 <body>
-<img src="http://somesite.com/boom.jpg" width=100 height=100/>
+<img src="http://fake.test.com/boom.png" width=100 height=50/>
 <div id="root">
   </div>
 </html>`;
@@ -50,8 +50,8 @@ const test = async () => {
 
   await page.setRequestInterceptionEnabled(true);
   page.on('request', request => {
-    if (/boom.jpg$/i.test(request.url)) {
-      request.continue({ url: 'file:///data/headless.jpg' });
+    if (/boom.png$/i.test(request.url)) {
+      request.continue({ url: 'file:///data/headless.png' });
     } else if (/\.(js|css|png|jpg|jpeg|gif|webp)$/i.test(request.url)) {
       request.abort();
     } else {
