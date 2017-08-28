@@ -55,7 +55,7 @@ const App = () =>
     <MediaDebugger />
     <Container>
       <h1>Hello World 123 !!</h1>
-    </Container>{' '}
+    </Container>
   </div>;
 
 export default App;
