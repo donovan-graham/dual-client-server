@@ -26,6 +26,7 @@
     "babel-watch": "^2.0.7",
     "html-webpack-harddisk-plugin": "^0.1.0",
     "html-webpack-plugin": "^2.29.0",
+    "jest": "^20.0.4",
     "path": "^0.12.7",
     "puppeteer": "^0.10.1",
     "webpack": "^3.3.0",
