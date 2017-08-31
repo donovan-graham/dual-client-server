@@ -1,8 +1,18 @@
 'use strict';
 
-const puppeteer = require('puppeteer');
-const devices = require('puppeteer/DeviceDescriptors');
-const Page = require('puppeteer/lib/Page');
+import puppeteer from 'puppeteer';
+import devices from 'puppeteer/DeviceDescriptors';
+import Page from 'puppeteer/lib/Page';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import fs from 'fs';
+import fse from 'fs-extra';
+import path from 'path';
+
+import { PNG } from 'pngjs';
+import pixelmatch from 'pixelmatch';
+
+import App from '../app';
 
 const html = `<!DOCTYPE html>
 <html>
@@ -17,14 +27,83 @@ const html = `<!DOCTYPE html>
   </div>
 </html>`;
 
-const sum = (a, b) => a + b;
-
 // async focus(selector) {
 //   const handle = await this.$(selector);
 //   console.assert(handle, 'No node found for selector: ' + selector);
 //   await handle.evaluate(element => element.focus());
 //   await handle.dispose();
 // }
+
+function compareImages(actualBuffer, expectedBuffer) {
+  if (!actualBuffer || !(actualBuffer instanceof Buffer)) return { errorMessage: 'Actual result should be Buffer.' };
+
+  const actual = PNG.sync.read(actualBuffer);
+  const expected = PNG.sync.read(expectedBuffer);
+  if (expected.width !== actual.width || expected.height !== actual.height) {
+    return {
+      errorMessage: `Sizes differ: expected image ${expected.width}px X ${expected.height}px, but got ${actual.width}px X ${actual.height}px. `,
+    };
+  }
+  const diff = new PNG({ width: expected.width, height: expected.height });
+  const count = pixelmatch(expected.data, actual.data, diff.data, expected.width, expected.height, { threshold: 0.1 });
+  return count > 0 ? { diff: PNG.sync.write(diff) } : null;
+}
+
+function compare(actual, goldenName) {
+  const goldenPath = path.join(__dirname, '__images__/golden');
+  const outputPath = path.join(__dirname, '__images__/output');
+
+  const expectedPath = path.join(goldenPath, goldenName);
+  const actualPath = path.join(outputPath, goldenName);
+
+  // fse.removeSync(addSuffix(actualPath, '-expected'));
+  // fse.removeSync(addSuffix(actualPath, '-actual'));
+  // fse.removeSync(addSuffix(actualPath, '-diff'));
+
+  const messageSuffix = 'Output is saved in "' + path.basename(outputPath + '" directory');
+
+  function addSuffix(filePath, suffix, customExtension) {
+    const dirname = path.dirname(filePath);
+    const ext = path.extname(filePath);
+    const name = path.basename(filePath, ext);
+    return path.join(dirname, name + suffix + (customExtension || ext));
+  }
+
+  if (!fs.existsSync(expectedPath)) {
+    fse.outputFileSync(actualPath, actual);
+    return {
+      pass: false,
+      message: goldenName + ' is missing in golden results. ' + messageSuffix,
+    };
+  }
+  const expected = fs.readFileSync(expectedPath);
+
+  const result = compareImages(actual, expected);
+
+  if (!result) return { pass: true };
+
+  fse.outputFileSync(addSuffix(actualPath, '-expected'), expected);
+  fse.outputFileSync(addSuffix(actualPath, '-actual'), actual);
+
+  if (result.diff) {
+    const diffPath = addSuffix(actualPath, '-diff', result.diffExtension);
+    fse.outputFileSync(diffPath, result.diff);
+  }
+
+  let message = goldenName + ' mismatch!';
+  if (result.errorMessage) message += ' ' + result.errorMessage;
+
+  return {
+    pass: false,
+    message: message + ' ' + messageSuffix,
+  };
+}
+
+expect.extend({
+  toBeGolden(actual, goldenName) {
+    return compare(actual, goldenName);
+  },
+});
 
 Page.prototype.blur = async function(selector, value) {
   await this.evaluate(() => document.activeElement.blur);
@@ -71,9 +150,9 @@ describe('matching cities to foods', () => {
     await page.setRequestInterceptionEnabled(true);
     page.on('request', request => {
       if (/api/i.test(request.url)) {
-        request.continue({ url: 'file:///data/headless.png' });
+        request.continue({ url: 'file:///data/client/assets/headless.png' });
       } else if (/boom.png$/i.test(request.url)) {
-        request.continue({ url: 'file:///data/headless.png' });
+        request.continue({ url: 'file:///data/client/assets/headless.png' });
       } else if (/\.(js|css|png|jpg|jpeg|gif|webp)$/i.test(request.url)) {
         request.abort();
       } else {
@@ -81,8 +160,10 @@ describe('matching cities to foods', () => {
       }
     });
 
+    const html = ReactDOMServer.renderToStaticMarkup(<App />);
+
     await page.setContent(html);
-    await page.injectFile('./dist/client/static/js/index.bundle.js');
+    // await page.injectFile('./dist/client/static/js/index.bundle.js');
 
     return page;
   });
@@ -124,6 +205,8 @@ describe('matching cities to foods', () => {
   // });
 
   test('getTextFor', async () => {
+    await page.setContent(html);
+
     const h1 = await page.getTextFor('h1');
     return expect(h1).toEqual('Hello World 123 !!');
   });
@@ -136,5 +219,10 @@ describe('matching cities to foods', () => {
   test('getText', async () => {
     const h1 = await page.getText('h1');
     return expect(h1).toEqual('Hello World 123 !!');
+  });
+
+  test('capture', async () => {
+    const screenshot = await page.screenshot({ fullPage: true });
+    return expect(screenshot).toBeGolden('home_desktop.png');
   });
 });

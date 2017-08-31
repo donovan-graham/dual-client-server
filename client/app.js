@@ -50,12 +50,13 @@ injectGlobal`
   }
 `;
 
-const App = () =>
+const App = () => (
   <div>
     <MediaDebugger />
     <Container>
-      <h1>Hello World 123 !!</h1>
+      <h1>Hello Bob 123 !!</h1>
     </Container>
-  </div>;
+  </div>
+);
 
 export default App;
