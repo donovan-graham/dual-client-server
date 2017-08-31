@@ -135,7 +135,7 @@ Page.prototype.getTextForAll = async function(selector) {
 //   return anchors.map(anchor => anchor.textContent);
 // });
 
-describe('matching cities to foods', () => {
+describe('home page', () => {
   let browser;
   let page;
 
@@ -221,8 +221,26 @@ describe('matching cities to foods', () => {
     return expect(h1).toEqual('Hello World 123 !!');
   });
 
-  test('capture', async () => {
-    const screenshot = await page.screenshot({ fullPage: true });
-    return expect(screenshot).toBeGolden('home_desktop.png');
-  });
+  const keys = ['iPhone 5', 'iPhone 6 Plus', 'Galaxy S III', 'Galaxy S5', 'iPad', 'iPad landscape'];
+  for (let key of keys) {
+    test(`capture ${key}`, async () => {
+      await page.setViewport(Object.assign({}, devices[key].viewport, { isMobile: false, hasTouch: false }));
+      const screenshot = await page.screenshot({ fullPage: true });
+      expect(screenshot).toBeGolden(`home_${key.toLowerCase().replace(/ /g, '_')}.png`);
+    });
+  }
 });
+
+// const capture = async page => {
+//   const originalViewport = page.viewport();
+//   await page.screenshot({ path: 'news_desktop.png', fullPage: true });
+//   await dimensions(page);
+
+//   for (let key of keys) {
+//     await page.setViewport(Object.assign({}, devices[key].viewport, { isMobile: false, hasTouch: false }));
+//     await dimensions(page);
+//     await page.screenshot({ path: `news_${key.toLowerCase().replace(/ /g, '_')}.png`, fullPage: true });
+//   }
+//   await page.setViewport(originalViewport);
+//   return page;
+// };
