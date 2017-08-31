@@ -70,7 +70,9 @@ describe('matching cities to foods', () => {
 
     await page.setRequestInterceptionEnabled(true);
     page.on('request', request => {
-      if (/boom.png$/i.test(request.url)) {
+      if (/api/i.test(request.url)) {
+        request.continue({ url: 'file:///data/headless.png' });
+      } else if (/boom.png$/i.test(request.url)) {
         request.continue({ url: 'file:///data/headless.png' });
       } else if (/\.(js|css|png|jpg|jpeg|gif|webp)$/i.test(request.url)) {
         request.abort();

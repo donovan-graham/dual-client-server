@@ -16,6 +16,9 @@ const html = `<!DOCTYPE html>
   </div>
 </html>`;
 
+// toBeGolden
+// https://github.com/GoogleChrome/puppeteer/blob/1f9b4fb4c83ad9f5963507675e6ad9011c4301ff/test/golden-utils.js#L26
+
 const keys = ['iPhone 5', 'iPhone 6 Plus', 'Galaxy S III', 'Galaxy S5', 'iPad', 'iPad landscape'];
 
 const dimensions = async page => {
