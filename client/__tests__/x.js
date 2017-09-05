@@ -8,6 +8,9 @@ import ReactDOMServer from 'react-dom/server';
 import fs from 'fs';
 import fse from 'fs-extra';
 import path from 'path';
+import gm from 'gm';
+
+const imageMagick = gm.subClass({ imageMagick: true });
 
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
@@ -34,22 +37,40 @@ const html = `<!DOCTYPE html>
 //   await handle.dispose();
 // }
 
-function compareImages(actualBuffer, expectedBuffer) {
+function getImageSize(imageBuffer) {
+  return new Promise(resolve => imageMagick(imageBuffer).size((err, size) => resolve(size)));
+}
+
+async function getSizesInfo(actualBuffer, expectedBuffer) {
+  const [actual, expected] = await Promise.all([getImageSize(actualBuffer), getImageSize(expectedBuffer)]);
+  return { actual, expected };
+}
+
+async function compareImages(actualBuffer, expectedBuffer) {
   if (!actualBuffer || !(actualBuffer instanceof Buffer)) return { errorMessage: 'Actual result should be Buffer.' };
 
-  const actual = PNG.sync.read(actualBuffer);
-  const expected = PNG.sync.read(expectedBuffer);
-  if (expected.width !== actual.width || expected.height !== actual.height) {
+  const sizes = await getSizesInfo(actualBuffer, expectedBuffer);
+
+  console.log('sizes', sizes);
+
+  if (sizes.expected.width !== sizes.actual.width || sizes.expected.height !== sizes.actual.height) {
     return {
-      errorMessage: `Sizes differ: expected image ${expected.width}px X ${expected.height}px, but got ${actual.width}px X ${actual.height}px. `,
+      errorMessage: `Sizes differ:
+        expected image ${sizes.expected.width}px X ${sizes.expected.height}px,
+        but got ${sizes.actual.width}px X ${sizes.actual.height}px.`,
     };
   }
+
+  return null;
+
   const diff = new PNG({ width: expected.width, height: expected.height });
-  const count = pixelmatch(expected.data, actual.data, diff.data, expected.width, expected.height, { threshold: 0.1 });
+  const count = pixelmatch(expected.data, actual.data, diff.data, expected.width, expected.height, {
+    threshold: 0.1,
+  });
   return count > 0 ? { diff: PNG.sync.write(diff) } : null;
 }
 
-function compare(actual, goldenName) {
+async function compare(actual, goldenName) {
   const goldenPath = path.join(__dirname, '__images__/golden');
   const outputPath = path.join(__dirname, '__images__/output');
 
@@ -78,17 +99,17 @@ function compare(actual, goldenName) {
   }
   const expected = fs.readFileSync(expectedPath);
 
-  const result = compareImages(actual, expected);
+  const result = await compareImages(actual, expected);
 
   if (!result) return { pass: true };
 
-  fse.outputFileSync(addSuffix(actualPath, '-expected'), expected);
-  fse.outputFileSync(addSuffix(actualPath, '-actual'), actual);
+  // fse.outputFileSync(addSuffix(actualPath, '-expected'), expected);
+  // fse.outputFileSync(addSuffix(actualPath, '-actual'), actual);
 
-  if (result.diff) {
-    const diffPath = addSuffix(actualPath, '-diff', result.diffExtension);
-    fse.outputFileSync(diffPath, result.diff);
-  }
+  // if (result.diff) {
+  //   const diffPath = addSuffix(actualPath, '-diff', result.diffExtension);
+  //   fse.outputFileSync(diffPath, result.diff);
+  // }
 
   let message = goldenName + ' mismatch!';
   if (result.errorMessage) message += ' ' + result.errorMessage;
@@ -100,8 +121,12 @@ function compare(actual, goldenName) {
 }
 
 expect.extend({
-  toBeGolden(actual, goldenName) {
-    return compare(actual, goldenName);
+  isGolden(compared) {
+    return Object.assign({}, compared, { pass: false, message: 'you betcha' });
+  },
+
+  toBeGolden: async (actual, goldenName) => {
+    return await compare(actual, goldenName);
   },
 });
 
@@ -226,7 +251,9 @@ describe('home page', () => {
     test(`capture ${key}`, async () => {
       await page.setViewport(Object.assign({}, devices[key].viewport, { isMobile: false, hasTouch: false }));
       const screenshot = await page.screenshot({ fullPage: true });
-      expect(screenshot).toBeGolden(`home_${key.toLowerCase().replace(/ /g, '_')}.png`);
+      const filename = `home_${key.toLowerCase().replace(/ /g, '_')}.png`;
+      const result = await compare(screenshot, filename);
+      expect(result).isGolden();
     });
   }
 });
