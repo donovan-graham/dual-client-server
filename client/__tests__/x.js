@@ -164,6 +164,7 @@ describe('home page', () => {
   let page;
 
   // async $(selector) {
+
   //   return this.mainFrame().$(selector);
   // }
 
@@ -228,30 +229,38 @@ describe('home page', () => {
   //   expect(x).toEqual('Hello World 123 !!');
   // });
 
-  test('getTextFor', async () => {
-    await page.setContent(html);
+  // test('getTextFor', async () => {
+  //   await page.setContent(html);
 
-    const h1 = await page.getTextFor('h1');
-    return expect(h1).toEqual('Hello World 123 !!');
-  });
+  //   const h1 = await page.getTextFor('h1');
+  //   return expect(h1).toEqual('Hello World 123 !!');
+  // });
 
-  test('getTextForAll', async () => {
-    const h1 = await page.getTextForAll('h1');
-    return expect(h1).toEqual(['Hello World 123 !!']);
-  });
+  // test('getTextForAll', async () => {
+  //   const h1 = await page.getTextForAll('h1');
+  //   return expect(h1).toEqual(['Hello World 123 !!']);
+  // });
 
-  test('getText', async () => {
-    const h1 = await page.getText('h1');
-    return expect(h1).toEqual('Hello World 123 !!');
-  });
+  // test('getText', async () => {
+  //   const h1 = await page.getText('h1');
+  //   return expect(h1).toEqual('Hello World 123 !!');
+  // });
 
   const keys = ['iPhone 5', 'iPhone 6 Plus', 'Galaxy S III', 'Galaxy S5', 'iPad', 'iPad landscape'];
   for (let key of keys) {
     test(`capture ${key}`, async () => {
+      const t1 = new Date().getTime();
+      console.log(`${key} start ${t1}`);
       await page.setViewport(Object.assign({}, devices[key].viewport, { isMobile: false, hasTouch: false }));
+      const t2 = new Date().getTime();
+      console.log(`${key} changed viewport ${t2 - t1}`);
       const screenshot = await page.screenshot({ fullPage: true });
+      const t3 = new Date().getTime();
+      console.log(`${key} screenshot ${t3 - t2}`);
       const filename = `home_${key.toLowerCase().replace(/ /g, '_')}.png`;
       const result = await compare(screenshot, filename);
+      const t4 = new Date().getTime();
+      console.log(`${key} compare ${t4 - t3}`);
       expect(result).isGolden();
     });
   }

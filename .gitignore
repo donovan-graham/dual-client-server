@@ -1,3 +1,9 @@
+## folders
 node_modules
 dist
+coverage
 **/__tests__/__images__/**/output/
+
+## files
+*.log
+docker-compose.override.yml
