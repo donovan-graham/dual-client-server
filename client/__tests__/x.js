@@ -41,17 +41,27 @@ function getImageSize(imageBuffer) {
   return new Promise(resolve => imageMagick(imageBuffer).size((err, size) => resolve(size)));
 }
 
+function getImageDiff(actualBuffer, expectedBuffer, diffOuputPath) {
+  return new Promise(resolve =>
+    imageMagick().compare(actualBuffer, expectedBuffer, { file: diffOuputPath }, (err, isEqual, equality, raw) =>
+      resolve({
+        error: err,
+        noise: equality,
+        match: equality === undefined ? 0 : (1 - equality) * 100,
+        raw,
+        file: diffOuputPath,
+      })
+    )
+  );
+}
+
 async function getSizesInfo(actualBuffer, expectedBuffer) {
   const [actual, expected] = await Promise.all([getImageSize(actualBuffer), getImageSize(expectedBuffer)]);
   return { actual, expected };
 }
 
-async function compareImages(actualBuffer, expectedBuffer) {
-  if (!actualBuffer || !(actualBuffer instanceof Buffer)) return { errorMessage: 'Actual result should be Buffer.' };
-
+async function compareImages(actualBuffer, expectedBuffer, diffOuputPath) {
   const sizes = await getSizesInfo(actualBuffer, expectedBuffer);
-
-  console.log('sizes', sizes);
 
   if (sizes.expected.width !== sizes.actual.width || sizes.expected.height !== sizes.actual.height) {
     return {
@@ -61,68 +71,57 @@ async function compareImages(actualBuffer, expectedBuffer) {
     };
   }
 
-  return null;
-
-  const diff = new PNG({ width: expected.width, height: expected.height });
-  const count = pixelmatch(expected.data, actual.data, diff.data, expected.width, expected.height, {
-    threshold: 0.1,
-  });
-  return count > 0 ? { diff: PNG.sync.write(diff) } : null;
+  return await getImageDiff(actualBuffer, expectedBuffer, diffOuputPath);
 }
 
-async function compare(actual, goldenName) {
+function addSuffix(filePath, suffix, customExtension) {
+  const dirname = path.dirname(filePath);
+  const ext = path.extname(filePath);
+  const name = path.basename(filePath, ext);
+  return path.join(dirname, name + suffix + (customExtension || ext));
+}
+
+async function compare(actualBuffer, goldenName) {
   const goldenPath = path.join(__dirname, '__images__/golden');
   const outputPath = path.join(__dirname, '__images__/output');
 
-  const expectedPath = path.join(goldenPath, goldenName);
-  const actualPath = path.join(outputPath, goldenName);
+  const expectedGoldenPath = path.join(goldenPath, goldenName);
 
-  // fse.removeSync(addSuffix(actualPath, '-expected'));
-  // fse.removeSync(addSuffix(actualPath, '-actual'));
-  // fse.removeSync(addSuffix(actualPath, '-diff'));
+  const expectedOutputPath = path.join(outputPath, addSuffix(goldenName, '-0-expected'));
+  const actualOutputPath = path.join(outputPath, addSuffix(goldenName, '-1-actual'));
+  const diffOuputPath = path.join(outputPath, addSuffix(goldenName, '-2-diff'));
 
-  const messageSuffix = 'Output is saved in "' + path.basename(outputPath + '" directory');
+  const messageSuffix = `Output saved in "${outputPath}".`;
+  fse.outputFileSync(actualOutputPath, actualBuffer);
 
-  function addSuffix(filePath, suffix, customExtension) {
-    const dirname = path.dirname(filePath);
-    const ext = path.extname(filePath);
-    const name = path.basename(filePath, ext);
-    return path.join(dirname, name + suffix + (customExtension || ext));
-  }
-
-  if (!fs.existsSync(expectedPath)) {
-    fse.outputFileSync(actualPath, actual);
+  if (!fs.existsSync(expectedGoldenPath)) {
     return {
       pass: false,
-      message: goldenName + ' is missing in golden results. ' + messageSuffix,
+      message: `${goldenName} file not found in "${goldenPath}". ${messageSuffix}`,
     };
   }
-  const expected = fs.readFileSync(expectedPath);
+  fse.copySync(expectedGoldenPath, expectedOutputPath);
+  const diff = await compareImages(actualOutputPath, expectedOutputPath, diffOuputPath);
 
-  const result = await compareImages(actual, expected);
+  if (diff.match === 100) {
+    fse.removeSync(expectedOutputPath);
+    fse.removeSync(actualOutputPath);
+    fse.removeSync(diffOuputPath);
+    return { pass: true };
+  }
 
-  if (!result) return { pass: true };
-
-  // fse.outputFileSync(addSuffix(actualPath, '-expected'), expected);
-  // fse.outputFileSync(addSuffix(actualPath, '-actual'), actual);
-
-  // if (result.diff) {
-  //   const diffPath = addSuffix(actualPath, '-diff', result.diffExtension);
-  //   fse.outputFileSync(diffPath, result.diff);
-  // }
-
-  let message = goldenName + ' mismatch!';
-  if (result.errorMessage) message += ' ' + result.errorMessage;
+  const message = diff.errorMessage ? `${goldenName} mismatch! ${diff.errorMessage}` : `${goldenName} mismatch!`;
 
   return {
     pass: false,
-    message: message + ' ' + messageSuffix,
+    message: `${message} ${messageSuffix}`,
   };
 }
 
 expect.extend({
   isGolden(compared) {
-    return Object.assign({}, compared, { pass: false, message: 'you betcha' });
+    return compared;
+    // return Object.assign({}, compared, { pass: false, message: 'you betcha' });
   },
 
   toBeGolden: async (actual, goldenName) => {
