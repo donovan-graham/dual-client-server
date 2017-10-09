@@ -1,0 +1,81 @@
+// async focus(selector) {
+//   const handle = await this.$(selector);
+//   console.assert(handle, 'No node found for selector: ' + selector);
+//   await handle.evaluate(element => element.focus());
+//   await handle.dispose();
+// }
+
+// test('t1', async () => {
+//   expect.assertions(2);
+//   const elements = await page.$$('h1');
+//   expect(elements.length).toBe(1);
+//   const x = await elements[0].evaluate(e => e.textContent);
+//   expect(x).toEqual('Hello World 123 !!');
+// });
+
+// test('t2', async () => {
+//   const x = await page.$('h1').then(y => y.evaluate(e => e.textContent));
+//   return expect(x).toEqual('Hello World 123 !!');
+// });
+
+// test('t3', async () => {
+//   const x = await page.$('h1').then(async y => await y.evaluate(e => e.textContent));
+//   return expect(x).toEqual('Hello World 123 !!');
+// });
+
+// test('t4', async () => {
+//   const el = await page.$('h1');
+//   const x = await el.evaluate(e => e.textContent);
+//   return expect(x).toEqual('Hello World 123 !!');
+// });
+
+// test('t5', async () => {
+//   expect.assertions(1);
+//   await page.waitFor('h1');
+//   const el = await page.$('h1');
+//   const x = await el.evaluate(e => e.textContent);
+//   expect(x).toEqual('Hello World 123 !!');
+// });
+
+// test('getTextFor', async () => {
+//   await page.setContent(html);
+
+//   const h1 = await page.getTextFor('h1');
+//   return expect(h1).toEqual('Hello World 123 !!');
+// });
+
+// test('getTextForAll', async () => {
+//   const h1 = await page.getTextForAll('h1');
+//   return expect(h1).toEqual(['Hello World 123 !!']);
+// });
+
+// test('getText', async () => {
+//   const h1 = await page.getText('h1');
+//   return expect(h1).toEqual('Hello World 123 !!');
+// });
+
+// const capture = async page => {
+//   const originalViewport = page.viewport();
+//   await page.screenshot({ path: 'news_desktop.png', fullPage: true });
+//   await dimensions(page);
+
+//   for (let key of keys) {
+//     await page.setViewport(Object.assign({}, devices[key].viewport, { isMobile: false, hasTouch: false }));
+//     await dimensions(page);
+//     await page.screenshot({ path: `news_${key.toLowerCase().replace(/ /g, '_')}.png`, fullPage: true });
+//   }
+//   await page.setViewport(originalViewport);
+//   return page;
+// };
+
+
+
+// // Extract the results from the page
+// const links = await page.evaluate(() => {
+//   const anchors = Array.from(document.querySelectorAll('h3 a'));
+//   return anchors.map(anchor => anchor.textContent);
+// });
+
+  // async $(selector) {
+  //   return this.mainFrame().$(selector);
+  // }

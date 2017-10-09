@@ -1,10 +1,13 @@
-'use strict';
+/**
+ * @jest-environment node
+ */
 
 import puppeteer from 'puppeteer';
 import devices from 'puppeteer/DeviceDescriptors';
 import Page from 'puppeteer/lib/Page';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
+import { renderToString, renderToStaticMarkup } from 'react-dom/server';
+import { ServerStyleSheet } from 'styled-components';
 import fs from 'fs';
 import fse from 'fs-extra';
 import path from 'path';
@@ -12,30 +15,8 @@ import gm from 'gm';
 
 const imageMagick = gm.subClass({ imageMagick: true });
 
-import { PNG } from 'pngjs';
-import pixelmatch from 'pixelmatch';
-
 import App from '../app';
-
-const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>React App Setup</title>
-  <meta name="viewport" content="width=device-width">
-</head>
-<body>
-<img src="http://fake.test.com/boom.png" width=100 height=50/>
-<div id="root">
-  </div>
-</html>`;
-
-// async focus(selector) {
-//   const handle = await this.$(selector);
-//   console.assert(handle, 'No node found for selector: ' + selector);
-//   await handle.evaluate(element => element.focus());
-//   await handle.dispose();
-// }
+import Button from '../restyled/button';
 
 function getImageSize(imageBuffer) {
   return new Promise(resolve => imageMagick(imageBuffer).size((err, size) => resolve(size)));
@@ -153,20 +134,17 @@ Page.prototype.getTextForAll = async function(selector) {
   return await Promise.all(els.map(el => el.evaluate(e => e.textContent)));
 };
 
-// // Extract the results from the page
-// const links = await page.evaluate(() => {
-//   const anchors = Array.from(document.querySelectorAll('h3 a'));
-//   return anchors.map(anchor => anchor.textContent);
-// });
+function createHtml(Component, innerText = null) {
+  const sheet = new ServerStyleSheet();
+  const body = renderToString(sheet.collectStyles(<Component>{innerText}</Component>));
+  const styleTags = sheet.getStyleTags();
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">${styleTags}</head><body><div id="root">${body}</div></body></html>`;
+}
 
 describe('home page', () => {
   let browser;
   let page;
-
-  // async $(selector) {
-
-  //   return this.mainFrame().$(selector);
-  // }
 
   beforeEach(async () => {
     browser = await puppeteer.launch({ args: ['--no-sandbox'] });
@@ -185,11 +163,6 @@ describe('home page', () => {
       }
     });
 
-    const html = ReactDOMServer.renderToStaticMarkup(<App />);
-
-    await page.setContent(html);
-    // await page.injectFile('./dist/client/static/js/index.bundle.js');
-
     return page;
   });
 
@@ -197,85 +170,34 @@ describe('home page', () => {
     return await browser.close();
   });
 
-  // test('t1', async () => {
-  //   expect.assertions(2);
-  //   const elements = await page.$$('h1');
-  //   expect(elements.length).toBe(1);
-  //   const x = await elements[0].evaluate(e => e.textContent);
-  //   expect(x).toEqual('Hello World 123 !!');
-  // });
-
-  // test('t2', async () => {
-  //   const x = await page.$('h1').then(y => y.evaluate(e => e.textContent));
-  //   return expect(x).toEqual('Hello World 123 !!');
-  // });
-
-  // test('t3', async () => {
-  //   const x = await page.$('h1').then(async y => await y.evaluate(e => e.textContent));
-  //   return expect(x).toEqual('Hello World 123 !!');
-  // });
-
-  // test('t4', async () => {
-  //   const el = await page.$('h1');
-  //   const x = await el.evaluate(e => e.textContent);
-  //   return expect(x).toEqual('Hello World 123 !!');
-  // });
-
-  // test('t5', async () => {
-  //   expect.assertions(1);
-  //   await page.waitFor('h1');
-  //   const el = await page.$('h1');
-  //   const x = await el.evaluate(e => e.textContent);
-  //   expect(x).toEqual('Hello World 123 !!');
-  // });
-
-  // test('getTextFor', async () => {
-  //   await page.setContent(html);
-
-  //   const h1 = await page.getTextFor('h1');
-  //   return expect(h1).toEqual('Hello World 123 !!');
-  // });
-
-  // test('getTextForAll', async () => {
-  //   const h1 = await page.getTextForAll('h1');
-  //   return expect(h1).toEqual(['Hello World 123 !!']);
-  // });
-
-  // test('getText', async () => {
-  //   const h1 = await page.getText('h1');
-  //   return expect(h1).toEqual('Hello World 123 !!');
-  // });
-
   const keys = ['iPhone 5', 'iPhone 6 Plus', 'Galaxy S III', 'Galaxy S5', 'iPad', 'iPad landscape'];
+
   for (let key of keys) {
     test(`capture ${key}`, async () => {
-      const t1 = new Date().getTime();
-      console.log(`${key} start ${t1}`);
+      await page.setContent(createHtml(App));
       await page.setViewport(Object.assign({}, devices[key].viewport, { isMobile: false, hasTouch: false }));
-      const t2 = new Date().getTime();
-      console.log(`${key} changed viewport ${t2 - t1}`);
       const screenshot = await page.screenshot({ fullPage: true });
-      const t3 = new Date().getTime();
-      console.log(`${key} screenshot ${t3 - t2}`);
       const filename = `home_${key.toLowerCase().replace(/ /g, '_')}.png`;
       const result = await compare(screenshot, filename);
-      const t4 = new Date().getTime();
-      console.log(`${key} compare ${t4 - t3}`);
       expect(result).isGolden();
     });
   }
+
+  test.only(`button test `, async () => {
+    await page.setContent(createHtml(Button, 'Click Me'));
+    const screenshot = await page.screenshot({ fullPage: true, omitBackground: false });
+    const filename = `simple_button.png`;
+    const result = await compare(screenshot, filename);
+    expect(result).isGolden();
+  });
+
+  test.only(`button hover test `, async () => {
+    await page.setContent(createHtml(Button, 'Click Me'));
+    const buttonElement = await page.$('button');
+    await buttonElement.hover();
+    const screenshot = await page.screenshot({ fullPage: true, omitBackground: false });
+    const filename = `simple_button_hover.png`;
+    const result = await compare(screenshot, filename);
+    expect(result).isGolden();
+  });
 });
-
-// const capture = async page => {
-//   const originalViewport = page.viewport();
-//   await page.screenshot({ path: 'news_desktop.png', fullPage: true });
-//   await dimensions(page);
-
-//   for (let key of keys) {
-//     await page.setViewport(Object.assign({}, devices[key].viewport, { isMobile: false, hasTouch: false }));
-//     await dimensions(page);
-//     await page.screenshot({ path: `news_${key.toLowerCase().replace(/ /g, '_')}.png`, fullPage: true });
-//   }
-//   await page.setViewport(originalViewport);
-//   return page;
-// };
