@@ -4,6 +4,8 @@ import Container from './restyled/container';
 import MediaDebugger from './restyled/debugger';
 import { BASE_FONT_SIZE } from './restyled/fonts';
 
+import Chart from './restyled/performance';
+
 injectGlobal`
   html, body, div, span, applet, object, iframe,
   h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -54,7 +56,7 @@ const App = () => (
   <div>
     <MediaDebugger />
     <Container>
-      <h1>Hello Bob 123 !!</h1>
+      <Chart />
     </Container>
   </div>
 );

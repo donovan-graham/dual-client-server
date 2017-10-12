@@ -17,6 +17,7 @@ const imageMagick = gm.subClass({ imageMagick: true });
 
 import App from '../app';
 import Button from '../restyled/button';
+import Chart from '../restyled/performance';
 
 function getImageSize(imageBuffer) {
   return new Promise(resolve => imageMagick(imageBuffer).size((err, size) => resolve(size)));
@@ -30,7 +31,7 @@ function getImageDiff(actualBuffer, expectedBuffer, diffOuputPath) {
         noise: equality,
         match: equality === undefined ? 0 : (1 - equality) * 100,
         raw,
-        file: diffOuputPath,
+        file: diffOuputPath
       })
     )
   );
@@ -48,7 +49,7 @@ async function compareImages(actualBuffer, expectedBuffer, diffOuputPath) {
     return {
       errorMessage: `Sizes differ:
         expected image ${sizes.expected.width}px X ${sizes.expected.height}px,
-        but got ${sizes.actual.width}px X ${sizes.actual.height}px.`,
+        but got ${sizes.actual.width}px X ${sizes.actual.height}px.`
     };
   }
 
@@ -78,7 +79,7 @@ async function compare(actualBuffer, goldenName) {
   if (!fs.existsSync(expectedGoldenPath)) {
     return {
       pass: false,
-      message: `${goldenName} file not found in "${goldenPath}". ${messageSuffix}`,
+      message: `${goldenName} file not found in "${goldenPath}". ${messageSuffix}`
     };
   }
   fse.copySync(expectedGoldenPath, expectedOutputPath);
@@ -95,7 +96,7 @@ async function compare(actualBuffer, goldenName) {
 
   return {
     pass: false,
-    message: `${message} ${messageSuffix}`,
+    message: `${message} ${messageSuffix}`
   };
 }
 
@@ -107,7 +108,7 @@ expect.extend({
 
   toBeGolden: async (actual, goldenName) => {
     return await compare(actual, goldenName);
-  },
+  }
 });
 
 Page.prototype.blur = async function(selector, value) {
@@ -183,7 +184,7 @@ describe('home page', () => {
     });
   }
 
-  test.only(`button test `, async () => {
+  test(`button test `, async () => {
     await page.setContent(createHtml(Button, 'Click Me'));
     const screenshot = await page.screenshot({ fullPage: true, omitBackground: false });
     const filename = `simple_button.png`;
@@ -191,12 +192,28 @@ describe('home page', () => {
     expect(result).isGolden();
   });
 
-  test.only(`button hover test `, async () => {
+  test(`button hover test `, async () => {
     await page.setContent(createHtml(Button, 'Click Me'));
     const buttonElement = await page.$('button');
     await buttonElement.hover();
     const screenshot = await page.screenshot({ fullPage: true, omitBackground: false });
     const filename = `simple_button_hover.png`;
+    const result = await compare(screenshot, filename);
+    expect(result).isGolden();
+  });
+
+  test.only(`performance chart test `, async () => {
+    await page.setContent(createHtml(Chart));
+    // const clip = {
+    //   x: 0,
+    //   y: 0,
+    //   width: 910,
+    //   height: 270
+    // };
+
+    // const screenshot = await page.screenshot({ omitBackground: false, clip });
+    const screenshot = await page.screenshot({ fullPage: true, omitBackground: false });
+    const filename = `performance_chart_full.png`;
     const result = await compare(screenshot, filename);
     expect(result).isGolden();
   });
