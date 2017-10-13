@@ -54,7 +54,7 @@ const domain = {
 
 const interpolation = 'linear'; // 'catmullRom'
 
-const domainPadding = { x: 0, y: [20, 1] };
+const domainPadding = { x: 0, y: [15, 1] };
 const padding = { left: 25, top: 0, bottom: 41, right: 25 };
 
 const yAxisStyle = {
@@ -83,13 +83,13 @@ const Chart = () => {
       domain={domain}
       padding={padding}
       containerComponent={<VictoryContainer responsive={false} />}
-      scale={{ x: 'time' }}
+      scale={{ x: 'time', y: 'log' }}
     >
       {/* x axis */}
       <VictoryAxis tickValues={xTickValues} tickFormat={d => d.getFullYear()} style={xAxisStyle} />
 
       {/* y axis */}
-      <VictoryAxis dependentAxis style={yAxisStyle} tickFormat={x => x} tickCount={30} />
+      <VictoryAxis dependentAxis style={yAxisStyle} tickFormat={() => ''} />
       <VictoryAxis dependentAxis offsetX={910 - padding.right} style={yAxisStyle} tickFormat={() => ''} />
 
       {/* y1 - Allan Gray */}
@@ -97,7 +97,7 @@ const Chart = () => {
         data={chartData}
         y={'y1'}
         interpolation={interpolation}
-        style={{ data: { stroke: '#c53146', strokeWidth: '1px' } }}
+        style={{ data: { stroke: '#c53146', strokeWidth: '1px', fill: 'none', strokeLinejoin: 'round' } }}
       />
 
       {/* y2 - Benchmark */}
@@ -105,7 +105,7 @@ const Chart = () => {
         data={chartData}
         y={'y2'}
         interpolation={interpolation}
-        style={{ data: { stroke: '#9f9f9f', strokeWidth: '1px' } }}
+        style={{ data: { stroke: '#9f9f9f', strokeWidth: '1px', fill: 'none', strokeLinejoin: 'round' } }}
       />
     </VictoryChart>
   );
