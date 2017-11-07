@@ -1,10 +1,12 @@
 import React from 'react';
-import { injectGlobal } from 'styled-components';
+import styled, { injectGlobal } from 'styled-components';
 import Container from './restyled/container';
 import MediaDebugger from './restyled/debugger';
 import { BASE_FONT_SIZE } from './restyled/fonts';
 
 import Chart from './restyled/performance';
+import Menu from './restyled/menu';
+import Content from './restyled/content';
 
 injectGlobal`
   html, body, div, span, applet, object, iframe,
@@ -54,10 +56,11 @@ injectGlobal`
 
 const App = () => (
   <div>
+    <Menu />
+    <Content>
+      <Container>Some text goes here</Container>
+    </Content>
     <MediaDebugger />
-    <Container>
-      <Chart />
-    </Container>
   </div>
 );
 
