@@ -9,6 +9,8 @@ import Menu from './restyled/menu';
 import MenuAccordion from './restyled/menu-accordion';
 
 import Content from './restyled/content';
+import menuConfig from './restyled/menu-config';
+import MenuBuilder from './restyled/menu-builder';
 
 injectGlobal`
   html, body, div, span, applet, object, iframe,
@@ -168,7 +170,10 @@ const App = () => (
       />
     </Menu>
     <Content>
-      <Container>Some text goes here</Container>
+      <Container>
+        Some text goes here
+        <MenuBuilder config={menuConfig} />
+      </Container>
     </Content>
     <MediaDebugger />
   </div>
