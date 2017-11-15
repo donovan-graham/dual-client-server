@@ -87,41 +87,28 @@ const PersonIcon = styled(SvgPerson)`
   width: 22px;
   height: 22px;
   fill: white;
-  float: left;
-  margin-right: 10px;
-  margin-bottom: 2px;
 `;
 
 const ChartIcon = styled(SvgChart)`
   width: 22px;
   height: 22px;
   fill: white;
-  float: left;
-  margin-right: 10px;
-  margin-bottom: 2px;
 `;
 
 const GearIcon = styled(SvgGear)`
   width: 22px;
   height: 22px;
   fill: white;
-  float: left;
-  margin-right: 10px;
-  margin-bottom: 2px;
 `;
-
 const SubMenuItem = styled.div`
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 20px;
-  height: 20px;
-  padding: 6px 8px 6px 8px;
+  height: 44px;
+  line-height: 44px;
+  padding-left: 38px;
   overflow: hidden;
-  display: block;
-  word-break: break-word;
-  background-color: #d5d5d5;
-  color: #fff;
-  transition: background-color 100ms linear;
+  cursor: pointer;
+  background-color: transparent;
+  transition: background-color 150ms linear;
+
   &:hover {
     background-color: #b5b5b5;
   }
@@ -134,39 +121,33 @@ const App = () => (
         icon={<PersonIcon />}
         title={'Your Account'}
         maxHeight={130}
-        panel={
-          <div>
-            <SubMenuItem>Update details</SubMenuItem>
-            <SubMenuItem>Reset password</SubMenuItem>
-            <SubMenuItem>Change billing</SubMenuItem>
-          </div>
-        }
+        panel={[
+          <SubMenuItem key="a">Update details</SubMenuItem>,
+          <SubMenuItem key="b">Reset password</SubMenuItem>,
+          <SubMenuItem key="c">Change billing</SubMenuItem>
+        ]}
       />
       <MenuAccordion
         icon={<ChartIcon />}
         title={'Charts'}
         maxHeight={350}
-        panel={
-          <div>
-            <SubMenuItem>Sub 1</SubMenuItem>
-            <SubMenuItem>Sub 2</SubMenuItem>
-            <SubMenuItem>Sub 3</SubMenuItem>
-            <SubMenuItem>Sub 4</SubMenuItem>
-            <SubMenuItem>Sub 5</SubMenuItem>
-          </div>
-        }
+        panel={[
+          <SubMenuItem key="a">Sub 1 Sub 1 Sub 1Sub 1Sub 1Sub 1Sub 1Sub 1Sub 1Sub 1Sub 1Sub 1Sub 1</SubMenuItem>,
+          <SubMenuItem key="b">Sub 2</SubMenuItem>,
+          <SubMenuItem key="c">Sub 3</SubMenuItem>,
+          <SubMenuItem key="d">Sub 4</SubMenuItem>,
+          <SubMenuItem key="e">Sub 5</SubMenuItem>
+        ]}
       />
       <MenuAccordion
         icon={<GearIcon />}
         title={'Stuff'}
         maxHeight={130}
-        panel={
-          <div>
-            <SubMenuItem>Sub 1</SubMenuItem>
-            <SubMenuItem>Sub 2</SubMenuItem>
-            <SubMenuItem>Sub 3</SubMenuItem>
-          </div>
-        }
+        panel={[
+          <SubMenuItem key="a">Sub 1</SubMenuItem>,
+          <SubMenuItem key="b">Sub 2</SubMenuItem>,
+          <SubMenuItem key="c">Sub 3</SubMenuItem>
+        ]}
       />
     </Menu>
     <Content>

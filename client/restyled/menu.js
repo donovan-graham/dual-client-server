@@ -18,8 +18,8 @@ class Menu extends React.Component {
   constructor(props) {
     super(props);
     this.state = { isOpen: false };
-    this.handleEnter = this.handleEnter.bind(this);
 
+    this.handleEnter = this.handleEnter.bind(this);
     this.handleExit = this.handleExit.bind(this);
   }
 
