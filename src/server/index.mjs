@@ -4,7 +4,7 @@ import path from 'path';
 const __dirname = path.dirname(import.meta.url).substr(7);
 console.log(__dirname);
 
-const clientDistPath = path.join(__dirname, '../../dist/client');
+const clientDistPath = path.join(__dirname, '../../dist');
 const viewsDirectoryPath = path.join(__dirname, '/views');
 
 const appUrl = 'http://localhost:3000';
