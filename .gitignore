@@ -2,7 +2,7 @@
 node_modules
 dist
 coverage
-**/__tests__/__images__/**/output/
+.cache
 
 ## files
 *.log
