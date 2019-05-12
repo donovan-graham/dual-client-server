@@ -15,8 +15,10 @@ services:
       - .:/data
     ports:
       - 3001:3001
-    working_dir: /data
-    command: ['npm', 'run', 'dev-app']
+    working_dir: /data/app
+    # environment:
+    #   - PARCEL_WORKERS=1
+    command: ['npm', 'run', 'dev:app']
 
   # express server
   server:
@@ -25,8 +27,11 @@ services:
       - .:/data
     ports:
       - '3000:3000'
-    working_dir: /data
-    command: ['npm', 'run', 'dev-server']
+    working_dir: /data/server
+    environment:
+      - APP_URL=http://localhost:3000
+      - APP_VERSION=v0.0.0-devbuild
+    command: ['npm', 'run', 'dev:server']
 
 networks:
   default:

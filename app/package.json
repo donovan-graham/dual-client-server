@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build:app": "parcel build",
-    "dev:app": "parcel watch src/app/investor.js src/app/adviser.js --out-dir dist --public-url /static/ --hmr-port 3001",
-    "dev:server": "nodemon --experimental-modules --watch src/server src/server/index.mjs",
-    "prod:server": "node --experimental-modules src/server/index.mjs"
+    "build:app": "parcel build investor.js adviser.js --out-dir ../dist --no-cache --no-source-maps --no-content-hash",
+    "build:app:aggresive": "npm run build:app -- --experimental-scope-hoisting",
+    "dev:app": "parcel watch investor.js adviser.js --out-dir ../dist --public-url /static/ --hmr-port 3001"
   },
   "keywords": [],
   "author": "",
@@ -23,16 +22,12 @@
     "babel-plugin-styled-components": "1.10.0",
     "jest": "24.8.0",
     "jest-styled-components": "6.3.1",
-    "nodemon": "1.19.0",
     "parcel-bundler": "1.12.3",
-    "react-hot-loader": "4.8.4",
-    "react-test-renderer": "16.8.6"
-  },
-  "dependencies": {
-    "ejs": "2.6.1",
-    "express": "4.16.4",
     "react": "16.8.6",
     "react-dom": "16.8.6",
+    "react-hot-loader": "4.8.4",
+    "react-test-renderer": "16.8.6",
     "styled-components": "4.2.0"
-  }
+  },
+  "dependencies": {}
 }

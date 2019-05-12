@@ -1,0 +1,21 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:server": "nodemon --experimental-modules index.mjs",
+    "prod:server": "node --experimental-modules index.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "24.8.0",
+    "nodemon": "1.19.0"
+  },
+  "dependencies": {
+    "ejs": "2.6.1",
+    "express": "4.16.4"
+  }
+}
