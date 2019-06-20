@@ -2,6 +2,17 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import merge from 'lodash/merge';
 
+// _.has(object, 'a.b');
+// _.has(object, ['a', 'b']);
+
+// _.get(object, 'a[0].b.c');
+// _.get(object, ['a', '0', 'b', 'c']);
+
+// _.set(object, 'a[0].b.c', 4);
+// _.set(object, ['x', '0', 'y', 'z'], 5);
+
+// _.setWith(object, '[0][1]', 'a', Object);
+
 import Options, {
   FIELD_NAME_OPTIONS,
   FIELD_VALUE_OPTIONS_ADVISER,
