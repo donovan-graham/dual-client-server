@@ -49,6 +49,12 @@ export const SInput = styled.input`
   font-size: 16px;
   color: #222;
   max-width: 340px;
+  outline: none;
+
+  &:focus {
+    background-color: aliceblue;
+    border: 1px solid skyblue;
+  }
 
   &::placeholder {
     font-size: 12px;
@@ -115,7 +121,15 @@ export const RadioGroup = connect(
 );
 
 const Field = connect(
-  ({ formik: { touched, errors, values, handleChange, handleBlur }, id, name, label, type = 'text', ...props }) => {
+  ({
+    formik: { touched, errors, values, handleChange, handleBlur },
+    id,
+    name,
+    label,
+    type = 'text',
+    required = true,
+    ...props
+  }) => {
     const fieldId = id || name;
     const value = getIn(values, name);
     const hasTouch = getIn(touched, name);
@@ -139,7 +153,7 @@ const Field = connect(
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
-          aria-required={true}
+          aria-required={required}
           aria-invalid={hasError}
           aria-describedby={ariaErrorId}
         />
