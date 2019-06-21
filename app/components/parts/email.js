@@ -1,6 +1,7 @@
 import React from 'react';
-import { Field, ErrorMessage } from 'formik';
 import pick from 'lodash/pick';
+
+import Field from './field';
 
 const FIELD_NAME_EMAIL = 'email';
 
@@ -18,13 +19,7 @@ const validate = values => {
 };
 
 const Component = () => (
-  <div>
-    <label>
-      Email:
-      <Field type="email" name={FIELD_NAME_EMAIL} />
-    </label>
-    <ErrorMessage name={FIELD_NAME_EMAIL} component="div" />
-  </div>
+  <Field type="email" name={FIELD_NAME_EMAIL} label="Email" placeholder="Enter your email address" />
 );
 
 export { FIELD_NAME_EMAIL };

@@ -1,7 +1,9 @@
 import React from 'react';
-import { Field, ErrorMessage, FormikConsumer } from 'formik';
-import { FIELD_NAME_OPTIONS, FIELD_VALUE_OPTIONS_INVESTOR } from './options';
+import { FormikConsumer } from 'formik';
 import pick from 'lodash/pick';
+
+import { FIELD_NAME_OPTIONS, FIELD_VALUE_OPTIONS_INVESTOR } from './options';
+import Field from './field';
 
 const FIELD_NAME_PASSWORD = 'password';
 
@@ -17,7 +19,7 @@ const validate = values => {
   if (!values[FIELD_NAME_PASSWORD]) {
     errors[FIELD_NAME_PASSWORD] = 'Required';
   } else if (values[FIELD_NAME_PASSWORD].length <= 4) {
-    errors[FIELD_NAME_PASSWORD] = 'Password too short';
+    errors[FIELD_NAME_PASSWORD] = 'Must have at least 5 characters';
   }
   return errors;
 };
@@ -26,13 +28,7 @@ const Component = () => (
   <FormikConsumer>
     {({ values }) =>
       isActive(values) ? (
-        <div>
-          <label>
-            Password:
-            <Field type="password" name={FIELD_NAME_PASSWORD} />
-          </label>
-          <ErrorMessage name={FIELD_NAME_PASSWORD} component="div" />
-        </div>
+        <Field type="password" name={FIELD_NAME_PASSWORD} label="Password" placeholder="Enter your password" />
       ) : null
     }
   </FormikConsumer>
