@@ -25,20 +25,6 @@ const options = [
 ];
 
 const Component = () => <RadioGroup options={options} name={FIELD_NAME_OPTIONS} label="What option?" />;
-//   <fieldset>
-//     <legend>What option?</legend>
-//     <ErrorMessage name={FIELD_NAME_OPTIONS} />
-//     <Field component={RadioButton} value={FIELD_VALUE_OPTIONS_INVESTOR} name={FIELD_NAME_OPTIONS}>
-//       Investor
-//     </Field>
-//     <Field component={RadioButton} value={FIELD_VALUE_OPTIONS_ADVISER} name={FIELD_NAME_OPTIONS}>
-//       Adviser
-//     </Field>
-//     <Field component={RadioButton} value={FIELD_VALUE_OPTIONS_ADMIN} name={FIELD_NAME_OPTIONS}>
-//       Administrator
-//     </Field>
-//   </fieldset>
-// );
 
 export { FIELD_NAME_OPTIONS, FIELD_VALUE_OPTIONS_INVESTOR, FIELD_VALUE_OPTIONS_ADVISER, FIELD_VALUE_OPTIONS_ADMIN };
 

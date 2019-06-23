@@ -52,11 +52,11 @@ export const SInput = styled.input`
   outline: none;
 
   &:focus {
-    background-color: aliceblue;
-    border: 1px solid skyblue;
+    background-color: #e7f0fe;
+    border: 1px solid lightsteelblue;
   }
 
-  &::placeholder {
+  &:placeholder {
     font-size: 12px;
     margin-top: -4px;
     vertical-align: top;
@@ -79,19 +79,26 @@ export const FlexColumn = styled.div`
 `;
 
 export const RadioGroup = connect(
-  ({ formik: { touched, errors, values, handleChange, handleBlur }, options, id, name, label }) => {
-    const value = getIn(values, name);
-    const hasTouch = getIn(touched, name);
-
+  ({
+    formik: { touched, errors, values, handleChange, handleBlur },
+    options,
+    id,
+    name,
+    isInitialValid = true,
+    label
+  }) => {
     const fieldId = id || name;
-    const error = hasTouch ? getIn(errors, name) : null;
+
+    const value = getIn(values, name);
+    const showError = getIn(touched, name) || isInitialValid;
+    const error = showError ? getIn(errors, name) : null;
     const hasError = !!error;
     const ariaErrorId = `${fieldId}_error`;
 
     return (
       <SFieldSet>
         <SLegend>
-          {hasTouch ? hasError ? <SCross>×</SCross> : <STick>✓</STick> : null}
+          {showError ? hasError ? <SCross>×</SCross> : <STick>✓</STick> : null}
           {label}
         </SLegend>
         {hasError ? (
