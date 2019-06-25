@@ -51,6 +51,10 @@ export const SInput = styled.input`
   max-width: 340px;
   outline: none;
 
+  &[data-error='true'] {
+    border-bottom-color: red !important;
+  }
+
   &:focus {
     background-color: #e7f0fe;
     border: 1px solid lightsteelblue;
@@ -119,7 +123,7 @@ export const RadioGroup = ({ options, id, name, isInitialValid = true, label }) 
   );
 };
 
-const Field = ({ id, name, label, type = 'text', required = true, ...props }) => {
+const Field = ({ id, name, label, type = 'text', required = true, children, ...props }) => {
   const { touched, errors, values, handleChange, handleBlur } = useFormikContext();
 
   const fieldId = id || name;
@@ -132,8 +136,7 @@ const Field = ({ id, name, label, type = 'text', required = true, ...props }) =>
   return (
     <FlexColumn>
       <SLabel htmlFor={fieldId}>
-        {hasTouch ? hasError ? <SCross>×</SCross> : <STick>✓</STick> : null}
-        {label}:
+        {children || label} {hasTouch && !hasError && <STick>✓</STick>}
       </SLabel>
 
       <SInput
@@ -147,13 +150,14 @@ const Field = ({ id, name, label, type = 'text', required = true, ...props }) =>
         aria-required={required}
         aria-invalid={hasError}
         aria-describedby={ariaErrorId}
+        data-error={hasTouch && hasError}
       />
 
-      {hasError ? (
+      {hasTouch && hasError && (
         <SError id={ariaErrorId} role="alert">
           ↪ {error}
         </SError>
-      ) : null}
+      )}
     </FlexColumn>
   );
 };
