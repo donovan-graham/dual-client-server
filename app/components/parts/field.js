@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { connect, getIn } from 'formik';
+import { useFormikContext, getIn } from 'formik';
 
 export const SFieldSet = styled.fieldset`
   border: 0;
@@ -78,101 +78,84 @@ export const FlexColumn = styled.div`
   flex-direction: column;
 `;
 
-export const RadioGroup = connect(
-  ({
-    formik: { touched, errors, values, handleChange, handleBlur },
-    options,
-    id,
-    name,
-    isInitialValid = true,
-    label
-  }) => {
-    const fieldId = id || name;
+export const RadioGroup = ({ options, id, name, isInitialValid = true, label }) => {
+  const { touched, errors, values, handleChange, handleBlur } = useFormikContext();
 
-    const value = getIn(values, name);
-    const showError = getIn(touched, name) || isInitialValid;
-    const error = showError ? getIn(errors, name) : null;
-    const hasError = !!error;
-    const ariaErrorId = `${fieldId}_error`;
+  const fieldId = id || name;
+  const value = getIn(values, name);
+  const showError = getIn(touched, name) || isInitialValid;
+  const error = showError ? getIn(errors, name) : null;
+  const hasError = !!error;
+  const ariaErrorId = `${fieldId}_error`;
 
-    return (
-      <SFieldSet>
-        <SLegend>
-          {showError ? hasError ? <SCross>×</SCross> : <STick>✓</STick> : null}
-          {label}
-        </SLegend>
-        {hasError ? (
-          <SError id={ariaErrorId} role="alert">
-            ↪ {error}
-          </SError>
-        ) : null}
+  return (
+    <SFieldSet>
+      <SLegend>
+        {showError ? hasError ? <SCross>×</SCross> : <STick>✓</STick> : null}
+        {label}
+      </SLegend>
+      {hasError ? (
+        <SError id={ariaErrorId} role="alert">
+          ↪ {error}
+        </SError>
+      ) : null}
 
-        <FlexRow>
-          {options.map(([optValue, optLabel], i) => (
-            <SRadioLabel key={i}>
-              <input
-                type="radio"
-                name={name}
-                value={optValue}
-                checked={optValue === value}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              {optLabel}
-            </SRadioLabel>
-          ))}
-        </FlexRow>
-      </SFieldSet>
-    );
-  }
-);
+      <FlexRow>
+        {options.map(([optValue, optLabel], i) => (
+          <SRadioLabel key={i}>
+            <input
+              type="radio"
+              name={name}
+              value={optValue}
+              checked={optValue === value}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            {optLabel}
+          </SRadioLabel>
+        ))}
+      </FlexRow>
+    </SFieldSet>
+  );
+};
 
-const Field = connect(
-  ({
-    formik: { touched, errors, values, handleChange, handleBlur },
-    id,
-    name,
-    label,
-    type = 'text',
-    required = true,
-    ...props
-  }) => {
-    const fieldId = id || name;
-    const value = getIn(values, name);
-    const hasTouch = getIn(touched, name);
+const Field = ({ id, name, label, type = 'text', required = true, ...props }) => {
+  const { touched, errors, values, handleChange, handleBlur } = useFormikContext();
 
-    const error = hasTouch ? getIn(errors, name) : null;
-    const hasError = !!error;
-    const ariaErrorId = `${fieldId}_error`;
+  const fieldId = id || name;
+  const value = getIn(values, name);
+  const hasTouch = getIn(touched, name);
+  const error = hasTouch ? getIn(errors, name) : null;
+  const hasError = !!error;
+  const ariaErrorId = `${fieldId}_error`;
 
-    return (
-      <FlexColumn>
-        <SLabel htmlFor={fieldId}>
-          {hasTouch ? hasError ? <SCross>×</SCross> : <STick>✓</STick> : null}
-          {label}:
-        </SLabel>
+  return (
+    <FlexColumn>
+      <SLabel htmlFor={fieldId}>
+        {hasTouch ? hasError ? <SCross>×</SCross> : <STick>✓</STick> : null}
+        {label}:
+      </SLabel>
 
-        <SInput
-          {...props}
-          id={fieldId}
-          type={type}
-          name={name}
-          value={value}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          aria-required={required}
-          aria-invalid={hasError}
-          aria-describedby={ariaErrorId}
-        />
+      <SInput
+        {...props}
+        id={fieldId}
+        type={type}
+        name={name}
+        value={value}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        aria-required={required}
+        aria-invalid={hasError}
+        aria-describedby={ariaErrorId}
+      />
 
-        {hasError ? (
-          <SError id={ariaErrorId} role="alert">
-            ↪ {error}
-          </SError>
-        ) : null}
-      </FlexColumn>
-    );
-  }
-);
+      {hasError ? (
+        <SError id={ariaErrorId} role="alert">
+          ↪ {error}
+        </SError>
+      ) : null}
+    </FlexColumn>
+  );
+};
 
 export default Field;

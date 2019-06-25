@@ -3,11 +3,10 @@ import pick from 'lodash/pick';
 
 import Field from './field';
 
-const FIELD_NAME_EMAIL = 'email';
+export const FIELD_NAME_EMAIL = 'email';
 
-const initialValues = { [FIELD_NAME_EMAIL]: '' };
-const collectValues = values => pick(values, [FIELD_NAME_EMAIL]);
-
+export const initialValues = { [FIELD_NAME_EMAIL]: '' };
+export const collectValues = values => pick(values, [FIELD_NAME_EMAIL]);
 const validate = values => {
   let errors = {};
   if (!values[FIELD_NAME_EMAIL]) {
@@ -21,8 +20,6 @@ const validate = values => {
 const Component = () => (
   <Field type="email" name={FIELD_NAME_EMAIL} label="Email" placeholder="Enter your email address" />
 );
-
-export { FIELD_NAME_EMAIL };
 
 export default {
   Component,
