@@ -30,7 +30,7 @@
     "fs-extra": "^4.0.1",
     "gm": "^1.23.0",
     "html-webpack-harddisk-plugin": "^0.1.0",
-    "html-webpack-plugin": "^2.29.0",
+    "html-webpack-plugin": "^5.5.0",
     "jest": "20.0.3",
     "jest-styled-components": "^4.7.0",
     "moment": "^2.19.1",
